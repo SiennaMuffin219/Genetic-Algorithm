@@ -15,6 +15,7 @@ public:
 	int getLabel() const;
 	void setLabel(int);
 	double*& getPixels();
+	void createmPixels();
 	//double* getPixels();
 	Matrix getMatrixPixels() const;
 };

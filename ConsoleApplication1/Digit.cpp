@@ -1,6 +1,15 @@
 #include "pch.h"
 
 
+void Digit::createmPixels()
+{
+	mPixels = Matrix(1, size);
+	for (unsigned i = 0; i < size; i++)
+	{
+		mPixels.set(0, i, pixels[i]);
+	}
+}
+
 Digit::Digit()
 {
 	pixels = new double[28*28];
@@ -12,7 +21,7 @@ Digit::Digit(int l, double* p, unsigned s) : label(l), size(s)
 {
 	pixels = new double[s];
 	mPixels = Matrix(1, s);
-	for (size_t i = 0; i < s; i++)
+	for (unsigned i = 0; i < s; i++)
 	{
 		pixels[i] = p[i];
 		mPixels.set(0, i, p[i]);

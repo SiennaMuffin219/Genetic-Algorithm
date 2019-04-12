@@ -5,10 +5,10 @@ void AG::sortPop()
 {
 	bool sorted;
 
-	for (size_t i = 0; i < popSize - 1; i++)
+	for (unsigned i = 0; i < popSize - 1; i++)
 	{
 		sorted = true;
-		for (size_t j = 0; j < popSize - i - 1; j++)
+		for (unsigned j = 0; j < popSize - i - 1; j++)
 		{
 			if (population[i].getFitness() > population[i + 1].getFitness())
 			{
@@ -27,7 +27,7 @@ AG::AG(unsigned popSize, unsigned nbTurns) : popSize(popSize), nbTurns(nbTurns)
 {
 	population = new Individual[popSize];
 
-	for (size_t i = 0; i < popSize; i++)
+	for (unsigned i = 0; i < popSize; i++)
 	{
 		//population[i] = Individual();
 		std::cout << population[i].getId() << std::endl;
@@ -36,18 +36,18 @@ AG::AG(unsigned popSize, unsigned nbTurns) : popSize(popSize), nbTurns(nbTurns)
 
 void AG::evolve(const Digit* inputs, unsigned inputsSize)
 {
-	for (size_t turn = 0; turn < nbTurns; turn++)
+	for (unsigned turn = 0; turn < nbTurns; turn++)
 	{
 		std::cout << "Turn #" << turn << std::endl;
 		int meanFit = 0;
 
-		for (size_t i = 0; i < popSize; i++)
+		for (unsigned i = 0; i < popSize; i++)
 		{
 			std::cout << "Started individual #" << i << std::endl;
 
-			for (size_t j = 0; j < inputsSize; j++)
+			for (unsigned j = 0; j < inputsSize; j++)
 			{
-				int result = (int)population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0) * 5 + 5;
+				int result = static_cast<int>(population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0)) * 5 + 5;
 				if (result == inputs[j].getLabel())
 					population[i].incrementFitness();
 
@@ -64,12 +64,12 @@ void AG::evolve(const Digit* inputs, unsigned inputsSize)
 
 		unsigned nbKeep = popSize / 2;
 
-		for (size_t i = 0; i < nbKeep; i++)
+		for (unsigned i = 0; i < nbKeep; i++)
 		{
 			population[i].setFitness(0);
 		}
 
-		for (size_t i = nbKeep; i < popSize; i++)
+		for (unsigned i = nbKeep; i < popSize; i++)
 		{
 			int parA = rand() % nbKeep;
 			int parB = rand() % nbKeep;

@@ -36,7 +36,7 @@ int main()
 		}
 	}
 
-	for (size_t i = 0; i < NB_DIGITS; i++)
+	for (unsigned i = 0; i < NB_DIGITS; i++)
 	{
 		labels_f >> labels[i];
 	}
@@ -62,11 +62,11 @@ int main()
 		}
 	}
 
-	for (size_t i = 0; i < NB_DIGITS; i++)
+	for (unsigned i = 0; i < NB_DIGITS; i++)
 	{
 		images[i].setLabel(labels[i]);
 		double* numbers = images[i].getPixels();
-		for (size_t j = 0; j < 28; j++)
+		for (unsigned j = 0; j < 28; j++)
 		{
 			string line;
 			getline(images_f, line);
@@ -74,7 +74,7 @@ int main()
 				cout << line << endl;*/
 			line = line.substr(2, 111);
 			//cout << line << endl;
-			for (size_t k = 0; k < 28; k++)
+			for (unsigned k = 0; k < 28; k++)
 			{
 				//cout << "[" << line.substr(0, 3) << "]  ";
 				numbers[j * 28 + k] = stoi(line.substr(0, 3));
@@ -84,12 +84,13 @@ int main()
 				line = line.substr(4);
 			}
 		}
+		images[i].createmPixels();
 	}
 	images_f.close();
 
 	//cout << images[785].getLabel() << endl;
 	//cout << images[785].getPixels()[77] << endl;
-	AG r = AG(1, 100);//.evolve(images, NB_DIGITS);
+	AG(1, 100).evolve(images, NB_DIGITS);
 	char a; cin >> a;
 
 	/*Matrix m(4, 2);

@@ -13,6 +13,7 @@ public:
 	Matrix(const Matrix&);
 	Matrix operator*(const Matrix&);
 	Matrix operator~();
+	Matrix operator=(const Matrix&);
 	double get(unsigned, unsigned) const;
 	void set(unsigned, unsigned, double);
 	unsigned getSizex();

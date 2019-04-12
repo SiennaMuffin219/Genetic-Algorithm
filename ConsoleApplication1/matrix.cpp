@@ -14,7 +14,7 @@ Matrix::Matrix(const Matrix& other) : Matrix(other.sizex, other.sizey)
 {
 	//cells = new double[other.sizex * other.sizey];
 
-	for (size_t i = 0; i < other.sizex * other.sizey; i++)
+	for (unsigned i = 0; i < other.sizex * other.sizey; i++)
 	{
 		cells[i] = other.cells[i];
 	}
@@ -27,12 +27,12 @@ Matrix Matrix::operator*(const Matrix& other)
 
 	Matrix result(other.sizex, sizey);
 
-	for (size_t i = 0; i < other.sizex; i++)
+	for (unsigned i = 0; i < other.sizex; i++)
 	{
-		for (size_t j = 0; j < sizey; j++)
+		for (unsigned j = 0; j < sizey; j++)
 		{
 			double toAdd = 0;
-			for (size_t k = 0; k < other.sizey; k++)
+			for (unsigned k = 0; k < other.sizey; k++)
 			{
 				toAdd += other.get(i, k) * get(k, j);
 			}
@@ -49,13 +49,27 @@ Matrix Matrix::operator~()
 
 	for (int i = sizey - 1; i >= 0; i--)
 	{
-		for (size_t j = 0; j < sizex; j++)
+		for (unsigned j = 0; j < sizex; j++)
 		{
 			result.set(i, j, get(j, i));
 		}
 	}
 
 	return result;
+}
+
+Matrix Matrix::operator=(const Matrix& other) 
+{
+	sizex = other.sizex;
+	sizey = other.sizey;
+	cells = new double[other.sizex * other.sizey];
+
+	for (unsigned i = 0; i < other.sizex * other.sizey; i++)
+	{
+		cells[i] = other.cells[i];
+	}
+	
+	return *this;
 }
 
 double Matrix::get(unsigned x, unsigned y) const
@@ -69,6 +83,7 @@ void Matrix::set(unsigned x, unsigned y, double value)
 {
 	if (x < 0 || x >= sizex || y < 0 || y >= sizey)
 		throw "Out of bounds";
+
 	cells[x * sizey + y] = value;
 }
 
@@ -84,7 +99,7 @@ unsigned Matrix::getSizey()
 
 void Matrix::matrixTanh()
 {
-	for (size_t i = 0; i < sizex * sizey; i++)
+	for (unsigned i = 0; i < sizex * sizey; i++)
 	{
 		cells[i] = tanh(cells[i]);
 	}
@@ -98,9 +113,9 @@ Matrix::~Matrix()
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m)
 {
-	for (size_t i = 0; i < m.sizey; i++)
+	for (unsigned i = 0; i < m.sizey; i++)
 	{
-		for (size_t j = 0; j < m.sizex; j++)
+		for (unsigned j = 0; j < m.sizex; j++)
 		{
 			os << m.cells[j * m.sizey + i] << " ";
 		}
