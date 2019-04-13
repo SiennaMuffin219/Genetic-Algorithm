@@ -23,7 +23,8 @@
 //	}
 //}
 
-void AG::sort(Individual* pop, int size) {
+void AG::sort(Individual* pop, unsigned size) {
+	Individual::stopId();
 	Individual* sortedPop = new Individual[size];
 	int minFitness;
 	int minInd;
@@ -53,7 +54,7 @@ void AG::sort(Individual* pop, int size) {
 	}
 
 	delete[] sortedPop;
-
+	Individual::backId();
 }
 
 AG::AG(unsigned popSize, unsigned nbTurns) : popSize(popSize), nbTurns(nbTurns)
@@ -69,38 +70,54 @@ AG::AG(unsigned popSize, unsigned nbTurns) : popSize(popSize), nbTurns(nbTurns)
 
 void AG::evolve(const Digit* inputs, unsigned inputsSize)
 {
+	int lastFit = 0;
 	for (unsigned turn = 0; turn < nbTurns; turn++)
 	{
-		std::cout << "Turn #" << turn << std::endl;
+		std::cout << "Turn \x1B[31m#" << turn << "\x1B[0m" << std::endl;
 		int meanFit = 0;
 
 		for (unsigned i = 0; i < popSize; i++)
 		{
-			std::cout << "Started individual #" << i << std::endl;
+			if (population[i].getFitness() != 0)
+			{
+				meanFit += population[i].getFitness();
+				std::cout << "Already done \x1B[34m#" << population[i].getId() << "\x1B[0m => fitness = \x1B[32m" << population[i].getFitness() << "\x1B[0m" << std::endl;
+				continue;
+			}
+
+			std::cout << "Started individual \x1B[34m#" << population[i].getId() << "\x1B[0m...";
 
 			for (unsigned j = 0; j < inputsSize; j++)
 			{
-				int result = static_cast<int>(population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0) * 5 + 5);
+				//int result = static_cast<int>(population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0) * 5 + 5);
+
+				Matrix results = population[i].getResults(inputs[j].getMatrixPixels());
+
+				int result = 0;
+				double max = results.get(0, 0);
+				for (size_t i = 1; i < 10; i++)
+				{
+					double cur = results.get(0, i);
+					if (cur > max)
+					{
+						max = cur;
+						result = i;
+					}
+				}
+
 				if (result == inputs[j].getLabel())
 					population[i].incrementFitness();
-
-				//if (j % 100 == 0)
-				//	std::cout << j << " : " << result << " => " << inputs[j].getLabel() << std::endl;
 			}
-			std::cout << "Finished individual #" << i << " => fitness = " << population[i].getFitness() << std::endl;
+			std::cout << " Finished" << " => fitness = " << (population[i].getFitness() > lastFit ? "\x1B[32m" : "\x1B[31m") << population[i].getFitness() << "\x1B[0m" << std::endl;
 			meanFit += population[i].getFitness();
 		}
 		meanFit /= popSize;
-		std::cout << "Mean fitness = " << meanFit << std::endl;
+		std::cout << "Mean fitness = \x1B[32m" << meanFit << "\x1B[0m" << std::endl;
+		lastFit = meanFit;
 
 		sort(population, popSize);
 
-		unsigned nbKeep = popSize / 2;
-
-		for (unsigned i = 0; i < nbKeep; i++)
-		{
-			population[i].setFitness(0);
-		}
+		unsigned nbKeep = popSize / 4;
 
 		for (unsigned i = nbKeep; i < popSize; i++)
 		{

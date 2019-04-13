@@ -1,11 +1,12 @@
 #include "pch.h"
 #include <random>
 
-static const unsigned genomeShapeData[] = { 28 * 28, 7 * 7, 10, 1 };
+static const unsigned genomeShapeData[] = { 28 * 28, 7 * 7, 10, 10 };
 const unsigned* Individual::genomeShape = genomeShapeData;
 const unsigned Individual::genomeShapeLength = 4;
-const unsigned Individual::genomeSize = 28 * 28 * 7 * 7 + 7 * 7 * 10 + 10;
+const unsigned Individual::genomeSize = 28 * 28 * 7 * 7 + 7 * 7 * 10 + 10 * 10;
 int Individual::lastId = -1;
+bool Individual::incrId = true;
 
 void Individual::createADN()
 {
@@ -58,7 +59,11 @@ void Individual::mutate(const Individual& A, const Individual& B)
 
 Individual::Individual()
 {
-	id = ++lastId;
+	if (Individual::incrId)
+		id = ++lastId;
+	else
+		id = lastId;
+
 	ADN = new double[genomeSize];
 	createADN();
 	createGenome();
@@ -80,6 +85,7 @@ Individual::Individual(const Individual & other)
 Individual::Individual(const Individual& A, const Individual& B)
 {
 	id = ++lastId;
+
 	ADN = new double[genomeSize];
 	mutate(A, B);
 	createGenome();
@@ -90,7 +96,7 @@ Individual Individual::operator=(const Individual& other)
 {
 	id = other.id;
 	//ADN = new double[genomeSize];
-	
+
 	delete[] genome;
 	for (unsigned i = 0; i < genomeSize; i++)
 		ADN[i] = other.ADN[i];
@@ -134,6 +140,15 @@ void Individual::incrementFitness()
 	fitness++;
 }
 
+void Individual::stopId()
+{
+	Individual::incrId = false;
+}
+
+void Individual::backId()
+{
+	Individual::incrId = true;
+}
 
 Individual::~Individual()
 {

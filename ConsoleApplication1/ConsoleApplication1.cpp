@@ -8,16 +8,18 @@
 #include <time.h>
 
 
-#define NB_DIGITS 1000
+#define NB_DIGITS 10000
 
 using namespace std;
 
 int main()
 {
+	cout << "Loading " << NB_DIGITS << " digits" << endl;
+
 	srand(time(NULL));
 	ifstream labels_f;
 	labels_f.open("train_labels.txt");
-	
+
 	int labels[NB_DIGITS];
 	if (!labels_f.is_open())
 	{
@@ -93,7 +95,7 @@ int main()
 
 	//cout << images[785].getLabel() << endl;
 	//cout << images[785].getPixels()[77] << endl;
-	AG(16, 100).evolve(images, NB_DIGITS);
+	AG(64, 100).evolve(images, NB_DIGITS);
 	char a; cin >> a;
 
 	/*Matrix m(4, 2);
@@ -135,7 +137,7 @@ int main()
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
+// Tips for Getting Started:
 //   1. Use the Solution Explorer window to add/manage files
 //   2. Use the Team Explorer window to connect to source control
 //   3. Use the Output window to see build output and other messages

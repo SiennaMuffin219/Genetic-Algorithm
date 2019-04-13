@@ -6,6 +6,7 @@ private:
 	static const unsigned genomeShapeLength;
 	static const unsigned genomeSize;
 	static int lastId;
+	static bool incrId;
 
 	int id;
 	Matrix* genome;
@@ -25,6 +26,8 @@ public:
 	int getFitness();
 	void setFitness(int);
 	void incrementFitness();
+	static void stopId();
+	static void backId();
 	virtual ~Individual();
 };
 
