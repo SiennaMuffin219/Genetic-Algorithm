@@ -1,9 +1,5 @@
 #include "pch.h"
 #include <random>
-#include <cstdlib>
-#include <cstdlib>
-#include <cstdlib>
-#include <cstdlib>
 
 static const unsigned genomeShapeData[] = { 28 * 28, 7 * 7, 10, 1 };
 const unsigned* Individual::genomeShape = genomeShapeData;
@@ -29,12 +25,12 @@ void Individual::createGenome()
 	int index = 0;
 	for (unsigned i = 0; i < genomeShapeLength - 1; i++)
 	{
-		genome[i] = Matrix(genomeShape[i + 1], genomeShape[i]);
+		genome[i] = Matrix(genomeShape[i], genomeShape[i + 1]);
 		for (unsigned j = 0; j < genomeShape[i + 1]; j++)
 		{
 			for (unsigned k = 0; k < genomeShape[i]; k++)
 			{
-				genome[i].set(j, k, ADN[index++]);
+				genome[i].set(k, j, ADN[index++]);
 			}
 		}
 	}
@@ -84,9 +80,25 @@ Individual::Individual(const Individual & other)
 Individual::Individual(const Individual& A, const Individual& B)
 {
 	id = ++lastId;
+	ADN = new double[genomeSize];
 	mutate(A, B);
 	createGenome();
 	fitness = 0;
+}
+
+Individual Individual::operator=(const Individual& other)
+{
+	id = other.id;
+	//ADN = new double[genomeSize];
+	
+	delete[] genome;
+	for (unsigned i = 0; i < genomeSize; i++)
+		ADN[i] = other.ADN[i];
+	//genome = other.genome;
+	createGenome();
+	fitness = other.fitness;
+
+	return *this;
 }
 
 Matrix Individual::getResults(const Matrix& inputs)

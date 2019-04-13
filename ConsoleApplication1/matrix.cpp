@@ -62,6 +62,7 @@ Matrix Matrix::operator=(const Matrix& other)
 {
 	sizex = other.sizex;
 	sizey = other.sizey;
+	delete[] cells;
 	cells = new double[other.sizex * other.sizey];
 
 	for (unsigned i = 0; i < other.sizex * other.sizey; i++)

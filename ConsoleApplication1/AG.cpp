@@ -1,26 +1,59 @@
 #include "pch.h"
 
 
-void AG::sortPop()
-{
-	bool sorted;
+//void AG::sortPop()
+//{
+//	bool sorted;
+//
+//	for (unsigned i = 0; i < popSize - 1; i++)
+//	{
+//		sorted = true;
+//		for (unsigned j = 0; j < popSize - i - 1; j++)
+//		{
+//			if (population[i].getFitness() > population[i + 1].getFitness())
+//			{
+//				sorted = false;
+//				Individual temp = population[i];
+//				population[i] = population[i + 1];
+//				population[i + 1] = temp;
+//			}
+//		}
+//		if (sorted)
+//			break;
+//	}
+//}
 
-	for (unsigned i = 0; i < popSize - 1; i++)
+void AG::sort(Individual* pop, int size) {
+	Individual* sortedPop = new Individual[size];
+	int minFitness;
+	int minInd;
+
+	for (size_t i = 0; i < size; i++)
 	{
-		sorted = true;
-		for (unsigned j = 0; j < popSize - i - 1; j++)
+		minFitness = INT32_MIN;
+		minInd = -1;
+		for (size_t j = 0; j < size; j++)
 		{
-			if (population[i].getFitness() > population[i + 1].getFitness())
+			if (pop[j].getFitness() > minFitness)
 			{
-				sorted = false;
-				Individual temp = population[i];
-				population[i] = population[i + 1];
-				population[i + 1] = temp;
+				minFitness = pop[j].getFitness();
+				minInd = j;
+
 			}
 		}
-		if (sorted)
-			break;
+
+		sortedPop[i] = pop[minInd];
+		pop[minInd].setFitness(INT32_MIN);
 	}
+
+
+	for (size_t i = 0; i < size; i++)
+	{
+		pop[i] = sortedPop[i];
+	}
+
+	delete[] sortedPop;
+
 }
 
 AG::AG(unsigned popSize, unsigned nbTurns) : popSize(popSize), nbTurns(nbTurns)
@@ -47,12 +80,12 @@ void AG::evolve(const Digit* inputs, unsigned inputsSize)
 
 			for (unsigned j = 0; j < inputsSize; j++)
 			{
-				int result = static_cast<int>(population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0)) * 5 + 5;
+				int result = static_cast<int>(population[i].getResults(inputs[j].getMatrixPixels()).get(0, 0) * 5 + 5);
 				if (result == inputs[j].getLabel())
 					population[i].incrementFitness();
 
-				if (j % 100 == 0)
-					std::cout << j << " : " << result << " => " << inputs[j].getLabel() << std::endl;
+				//if (j % 100 == 0)
+				//	std::cout << j << " : " << result << " => " << inputs[j].getLabel() << std::endl;
 			}
 			std::cout << "Finished individual #" << i << " => fitness = " << population[i].getFitness() << std::endl;
 			meanFit += population[i].getFitness();
@@ -60,7 +93,7 @@ void AG::evolve(const Digit* inputs, unsigned inputsSize)
 		meanFit /= popSize;
 		std::cout << "Mean fitness = " << meanFit << std::endl;
 
-		sortPop();
+		sort(population, popSize);
 
 		unsigned nbKeep = popSize / 2;
 

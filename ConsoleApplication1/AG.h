@@ -7,7 +7,8 @@ private:
 	unsigned popSize;
 	unsigned nbTurns;
 	Individual* population;
-	void sortPop();
+	//void sortPop();
+	static void sort(Individual*, int);
 public:
 	AG(unsigned popSize, unsigned nbTurns);
 	void evolve(const Digit*, unsigned);

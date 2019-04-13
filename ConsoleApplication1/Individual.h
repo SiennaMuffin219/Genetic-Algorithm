@@ -19,6 +19,7 @@ public:
 	Individual();
 	Individual(const Individual& other);
 	Individual(const Individual& A, const Individual& B);
+	Individual operator=(const Individual&);
 	Matrix getResults(const Matrix&);
 	int getId();
 	int getFitness();

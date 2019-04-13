@@ -5,14 +5,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <time.h>
 
 
-#define NB_DIGITS 10
+#define NB_DIGITS 1000
 
 using namespace std;
 
 int main()
 {
+	srand(time(NULL));
 	ifstream labels_f;
 	labels_f.open("train_labels.txt");
 	
@@ -76,13 +78,14 @@ int main()
 			//cout << line << endl;
 			for (unsigned k = 0; k < 28; k++)
 			{
-				//cout << "[" << line.substr(0, 3) << "]  ";
-				numbers[j * 28 + k] = stoi(line.substr(0, 3));
-				//cout << numbers[i * 28 + j] << endl;
+				//cout << /*"'" << line.substr(0, 3) << "'=" <<*/ stoi(line.substr(0, 3));
+				numbers[j * 28 + k] = stoi(line.substr(0, 3)) / 255.;
+				//cout << "=" << numbers[j * 28 + k] << "  ";
 				if (k == 27)
 					break;
 				line = line.substr(4);
 			}
+			//cout << endl;
 		}
 		images[i].createmPixels();
 	}
@@ -90,7 +93,7 @@ int main()
 
 	//cout << images[785].getLabel() << endl;
 	//cout << images[785].getPixels()[77] << endl;
-	AG(1, 100).evolve(images, NB_DIGITS);
+	AG(16, 100).evolve(images, NB_DIGITS);
 	char a; cin >> a;
 
 	/*Matrix m(4, 2);
