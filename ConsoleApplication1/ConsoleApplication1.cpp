@@ -6,21 +6,95 @@
 #include <fstream>
 #include <string>
 #include <time.h>
+//#include <cuda_runtime.h>
 
+#define RST	"\x1B[0m"
+#define RED	"\x1B[31m"
+#define GRN	"\x1B[32m"
+#define YEL	"\x1B[33m"
+#define BLU	"\x1B[34m"
+#define CONS_COLOR(X) (no_color ? "" : X)
 
-#define NB_DIGITS 10000
+#define CURS_POS(X, Y) "\033["#Y";"#X"H"
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-	cout << "Loading " << NB_DIGITS << " digits" << endl;
+	bool no_color = false;
+	int nbDigits = 1000;
+	int maxGen = 100;
+	int popSize = 16;
+	char imagePath[256] = "train_images.txt";
+	char labelPath[256] = "train_labels.txt";
+	
+	{
+		ArgsParser parser(7);
 
-	srand(time(NULL));
+		Option color_onOpt{ "-n", "--no-color", "No color output (use this option if things like \"\\x1B[31m\" appear in the output)", 0, nullptr, &no_color };
+		parser.add(color_onOpt);
+
+		OptionArg* nbDigitsArgs = new OptionArg[1]; nbDigitsArgs[0].name = "nb"; nbDigitsArgs[0].type = intArg; nbDigitsArgs[0].min = 1; nbDigitsArgs[0].varPtr = &nbDigits;
+		Option nbDigitsOpt{ "-d", "--nb-digits", "Use <nb> digits images for the training (default = 1000)", 1, nbDigitsArgs, nullptr };
+		parser.add(nbDigitsOpt);
+
+		OptionArg* maxGenArgs = new OptionArg[1]; maxGenArgs[0].name = "gen"; maxGenArgs[0].type = intArg; maxGenArgs[0].min = 0; maxGenArgs[0].varPtr = &maxGen;
+		Option maxGenOpt{ "-m", "--max-gen", "Set the number of maximum generations to <gen> (use 0 for infinite) (default = 100)", 1, maxGenArgs, nullptr };
+		parser.add(maxGenOpt);
+
+		OptionArg* popSizeArgs = new OptionArg[1]; popSizeArgs[0].name = "size"; popSizeArgs[0].type = intArg; popSizeArgs[0].min = 1; popSizeArgs[0].varPtr = &popSize;
+		Option popSizeOpt{ "-p", "--pop-size", "Set the population size to <size> (should be strictly positive) (default = 16)", 1, popSizeArgs, nullptr };
+		parser.add(popSizeOpt);
+
+		OptionArg* imagePathArgs = new OptionArg[1]; imagePathArgs[0].name = "file"; imagePathArgs[0].type = stringArg; imagePathArgs[0].varPtr = &imagePath;
+		Option imagePathOpt{ "-i", "--images", "Path to the images file (default = \"train_images.txt\")", 1, imagePathArgs, nullptr };
+		parser.add(imagePathOpt);
+
+		OptionArg* labelPathArgs = new OptionArg[1]; labelPathArgs[0].name = "file"; labelPathArgs[0].type = stringArg; labelPathArgs[0].varPtr = &labelPath;
+		Option labelPathOpt{ "-l", "--labels", "Path to the labels file (default = \"train_labels.txt\")", 1, labelPathArgs, nullptr };
+		parser.add(labelPathOpt);
+
+		bool help = false;
+		Option helpOpt{ "-h", "--help", "Display this help and exit", 0, nullptr, &help };
+		parser.add(helpOpt);
+
+
+		try
+		{
+			parser.execute(argc, argv);
+		}
+		catch (exception const &e)
+		{
+			cout << CONS_COLOR(RED) << e.what() << CONS_COLOR(RST) << endl;
+			exit(-1);
+		}
+
+		if (help)
+		{
+			char** text = new char*;
+			int helpSize = parser.help(text);
+			for (size_t i = 0; i < helpSize; i++)
+			{
+				cout << text[i] << endl;
+			}
+
+			exit(0);
+		}
+
+		delete nbDigitsArgs;
+		delete maxGenArgs;
+		delete popSizeArgs;
+		delete imagePathArgs;
+		delete labelPathArgs;
+	}
+
+	srand(static_cast<int>(time(NULL)));
+
+	cout << "Loading " << nbDigits << " digits" << endl;
 	ifstream labels_f;
 	labels_f.open("train_labels.txt");
 
-	int labels[NB_DIGITS];
+	int *labels = new int[nbDigits];
 	if (!labels_f.is_open())
 	{
 		labels_f.open("..\\ConsoleApplication1\\train_labels.txt");
@@ -40,7 +114,7 @@ int main()
 		}
 	}
 
-	for (unsigned i = 0; i < NB_DIGITS; i++)
+	for (size_t i = 0; i < nbDigits; i++)
 	{
 		labels_f >> labels[i];
 	}
@@ -50,7 +124,7 @@ int main()
 	ifstream images_f;
 	images_f.open("train_images.txt");
 
-	Digit *images = new Digit[NB_DIGITS];
+	Digit *images = new Digit[nbDigits];
 	if (!images_f.is_open())
 	{
 		images_f.open("..\\ConsoleApplication1\\train_images.txt");
@@ -66,7 +140,9 @@ int main()
 		}
 	}
 
-	for (unsigned i = 0; i < NB_DIGITS; i++)
+	unsigned dots = 0;
+
+	for (size_t i = 0; i < nbDigits; i++)
 	{
 		images[i].setLabel(labels[i]);
 		double* numbers = images[i].getPixels();
@@ -89,49 +165,19 @@ int main()
 			}
 			//cout << endl;
 		}
+		while (i * 100 / nbDigits > dots)
+		{
+			cout << ".";
+			dots++;
+		}
 		images[i].createmPixels();
 	}
+	cout << endl;
 	images_f.close();
+	delete labels;
 
-	//cout << images[785].getLabel() << endl;
-	//cout << images[785].getPixels()[77] << endl;
-	AG(64, 100).evolve(images, NB_DIGITS);
+	AG(popSize, (maxGen == 0 ? UINTMAX_MAX : maxGen), no_color).evolve(images, nbDigits);
 	char a; cin >> a;
-
-	/*Matrix m(4, 2);
-	m.set(0, 0, 42);
-	m.set(1, 0, 2);
-	m.set(2, 0, 3);
-	m.set(3, 0, 4);
-	m.set(0, 1, 5);
-	m.set(1, 1, 6);
-	m.set(2, 1, 7);
-	m.set(3, 1, 8);
-
-
-	Matrix n(3, 4);
-	n.set(0, 0, 1337);
-	n.set(1, 0, 2);
-	n.set(2, 0, 3);
-	n.set(0, 1, 4);
-	n.set(1, 1, 5);
-	n.set(2, 1, 6);
-	n.set(0, 2, 7);
-	n.set(1, 2, 8);
-	n.set(2, 2, 9);
-	n.set(0, 3, 10);
-	n.set(1, 3, 11);
-	n.set(2, 3, 12);
-
-	while (true)
-	{
-		m*n;
-	}
-
-	cout << n << endl;
-	m = Matrix(n);
-
-	cout << m << endl;// << n;// << endl << p;*/
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

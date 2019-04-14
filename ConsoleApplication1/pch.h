@@ -13,6 +13,7 @@
 #include "Digit.h"
 #include "Individual.h"
 #include "AG.h"
+#include "ArgsParser.h"
 // TODO: add headers that you want to pre-compile here
 
 #endif //PCH_H
