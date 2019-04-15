@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 
 	cout << "Loading " << nbDigits << " digits" << endl;
 	ifstream labels_f;
-	labels_f.open("train_labels.txt");
+	labels_f.open(labelPath);
 
 	int *labels = new int[nbDigits];
 	if (!labels_f.is_open())
@@ -107,7 +107,6 @@ int main(int argc, char** argv)
 				if (!labels_f.is_open())
 				{
 					cout << "Wrong path" << endl;
-					char a; cin >> a;
 					exit(-1);
 				}
 			}
@@ -122,7 +121,7 @@ int main(int argc, char** argv)
 
 
 	ifstream images_f;
-	images_f.open("train_images.txt");
+	images_f.open(imagePath);
 
 	Digit *images = new Digit[nbDigits];
 	if (!images_f.is_open())
@@ -135,13 +134,15 @@ int main(int argc, char** argv)
 			{
 				images_f.open("..\\train_images.txt");
 				if (!images_f.is_open())
+				{
+					cout << "Wrong path" << endl;
 					exit(-1);
+				}
 			}
 		}
 	}
 
 	unsigned dots = 0;
-
 	for (size_t i = 0; i < nbDigits; i++)
 	{
 		images[i].setLabel(labels[i]);
@@ -150,20 +151,15 @@ int main(int argc, char** argv)
 		{
 			string line;
 			getline(images_f, line);
-			/*if (i == 785)
-				cout << line << endl;*/
 			line = line.substr(2, 111);
-			//cout << line << endl;
+			
 			for (unsigned k = 0; k < 28; k++)
 			{
-				//cout << /*"'" << line.substr(0, 3) << "'=" <<*/ stoi(line.substr(0, 3));
 				numbers[j * 28 + k] = stoi(line.substr(0, 3)) / 255.;
-				//cout << "=" << numbers[j * 28 + k] << "  ";
 				if (k == 27)
 					break;
 				line = line.substr(4);
 			}
-			//cout << endl;
 		}
 		while (i * 100 / nbDigits > dots)
 		{
@@ -177,7 +173,6 @@ int main(int argc, char** argv)
 	delete labels;
 
 	AG(popSize, (maxGen == 0 ? UINTMAX_MAX : maxGen), no_color).evolve(images, nbDigits);
-	char a; cin >> a;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

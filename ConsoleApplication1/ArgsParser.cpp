@@ -67,12 +67,12 @@ void ArgsParser::execute(const int argc, char** argv)
 							switch (listArgs[j].args[k].type)
 							{
 							case intArg:
-								break;
 								*(int*)(listArgs[j].args[k].varPtr) = std::stoi(argv[i + k + 1]);
 								if (*(int*)listArgs[j].args[k].varPtr < listArgs[j].args[k].min)
 									throw std::out_of_range("Value less than minimum");
+								break;
 							case stringArg:
-								*(char**)listArgs[j].args[k].varPtr = argv[i + k + 1];
+								strcpy_s((char*)listArgs[j].args[k].varPtr, 256, argv[i + k + 1]);
 							default:
 								break;
 							}

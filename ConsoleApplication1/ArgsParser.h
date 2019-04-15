@@ -9,7 +9,7 @@ enum typeArg
 struct OptionArg
 {
 	const char* name;
-	typeArg type; // Only int implemented for now
+	typeArg type;
 	void* varPtr;
 	int min;
 };
