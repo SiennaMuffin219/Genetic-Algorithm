@@ -71,8 +71,8 @@ int main(int argc, char** argv)
 
 		if (help)
 		{
-			char** text = new char*;
-			int helpSize = parser.help(text);
+			char* text[256];
+			unsigned helpSize = parser.help(text);
 			for (size_t i = 0; i < helpSize; i++)
 			{
 				cout << text[i] << endl;
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	for (size_t i = 0; i < nbDigits; i++)
+	for (int i = 0; i < nbDigits; i++)
 	{
 		labels_f >> labels[i];
 	}
@@ -142,8 +142,8 @@ int main(int argc, char** argv)
 		}
 	}
 
-	unsigned dots = 0;
-	for (size_t i = 0; i < nbDigits; i++)
+	int dots = 0;
+	for (int i = 0; i < nbDigits; i++)
 	{
 		images[i].setLabel(labels[i]);
 		double* numbers = images[i].getPixels();

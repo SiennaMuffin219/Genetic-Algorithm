@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "ArgsParser.h"
+#include <limits>
+#include <string.h>
 #include <string>
 
-ArgsParser::ArgsParser(const int nbArgs)
+
+ArgsParser::ArgsParser(const unsigned nbArgs)
 {
 	listArgs = new Option[nbArgs];
 	maxArgs = nbArgs;
@@ -43,7 +46,7 @@ void ArgsParser::add(Option option)
 	currentArgs++;
 }
 
-void ArgsParser::execute(const int argc, char** argv)
+void ArgsParser::execute(const unsigned argc, char** argv)
 {
 	for (size_t i = 1; i < argc; i++)
 	{
@@ -57,8 +60,8 @@ void ArgsParser::execute(const int argc, char** argv)
 					if (argc < i + listArgs[j].argCount + 1)
 					{
 						char excep[128];
-						sprintf_s(excep, "Expected an integer value after %s", argv[i]);
-						throw std::exception(excep);
+						snprintf(excep, 128, "Expected an integer value after %s", argv[i]);
+						throw std::runtime_error(excep);
 					}
 					for (size_t k = 0; k < listArgs[j].argCount; k++)
 					{
@@ -72,7 +75,7 @@ void ArgsParser::execute(const int argc, char** argv)
 									throw std::out_of_range("Value less than minimum");
 								break;
 							case stringArg:
-								strcpy_s((char*)listArgs[j].args[k].varPtr, 256, argv[i + k + 1]);
+								memcpy((char*)listArgs[j].args[k].varPtr, argv[i + k + 1], 256);
 							default:
 								break;
 							}
@@ -80,14 +83,14 @@ void ArgsParser::execute(const int argc, char** argv)
 						catch (std::invalid_argument)
 						{
 							char excep[128];
-							sprintf_s(excep, "Bad input: %s %s should be an integer.", argv[i], argv[i + k + 1]);
-							throw std::exception(excep);
+							snprintf(excep, 128, "Bad input: %s %s should be an integer.", argv[i], argv[i + k + 1]);
+							throw std::runtime_error(excep);
 						}
 						catch (std::out_of_range)
 						{
 							char excep[128];
-							sprintf_s(excep, "Bad input: %s %s out of range (should be between %d and %d).", argv[i], argv[i + k + 1], listArgs[j].args[k].min, INT_MAX);
-							throw std::exception(excep);
+							snprintf(excep, 128, "Bad input: %s %s out of range (should be between %d and %d).", argv[i], argv[i + k + 1], listArgs[j].args[k].min, INT32_MAX);
+							throw std::runtime_error(excep);
 						}
 					}
 				}
@@ -96,37 +99,34 @@ void ArgsParser::execute(const int argc, char** argv)
 	}
 }
 
-int ArgsParser::help(char** text)
+unsigned ArgsParser::help(char* text[256])
 {
 	text[0] = new char[32];
-	strcpy_s(text[0], 32, "Usage: AlgoGen [options]");
+	strcpy(text[0], "Usage: AlgoGen [options]");
 	text[1] = new char[32];
-	strcpy_s(text[1], 32, "");
+	strcpy(text[1], "");
 	text[2] = new char[32];
-	strcpy_s(text[2], 32, "Options:");
+	strcpy(text[2], "Options:");
 
 	size_t maxChars = 0;
-	char** firstPart = new char*;
+	char* firstPart[128];
 	for (size_t i = 0; i < currentArgs; i++)
 	{
 		char args[64] = "";
 		if (listArgs[i].argCount > 0)
-			sprintf_s(args, 64, "<%s>", listArgs[i].args[0].name);
+			snprintf(args, 64, "<%s>", listArgs[i].args[0].name);
 		firstPart[i] = new char[128];
-		sprintf_s(firstPart[i], 128, "  %s %s %s", listArgs[i].shortArg, listArgs[i].longArg, args);
+		snprintf(firstPart[i], 128, "  %s %s %s", listArgs[i].shortArg, listArgs[i].longArg, args);
 		size_t len = strlen(firstPart[i]);
 		if (len > maxChars)
 			maxChars = len;
 	}
 	for (size_t i = 0; i < currentArgs; i++)
 	{
-		//char args[64];
-		//if (listArgs[i].argCount > 0)
-		//	sprintf_s(args, 64, "<%s>", listArgs[i].args[0].name);
 		for (size_t j = strlen(firstPart[i]); j < maxChars; j++)
-			strcat_s(firstPart[i], 128, " ");
+			strncat(firstPart[i], " ", 128);
 		text[i + 3] = new char[256];
-		sprintf_s(text[i + 3], 256, "  %s  %s", firstPart[i], listArgs[i].description);
+		snprintf(text[i + 3], 256, "  %s  %s", firstPart[i], listArgs[i].description);
 	}
 	return currentArgs + 3;
 }

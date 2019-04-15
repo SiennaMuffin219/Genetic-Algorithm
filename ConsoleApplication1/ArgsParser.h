@@ -19,7 +19,7 @@ struct Option
 	const char* shortArg;
 	const char* longArg;
 	const char* description;
-	int argCount;
+	unsigned argCount;
 	OptionArg* args;
 	bool* present;
 };
@@ -28,14 +28,14 @@ class ArgsParser
 {
 private:
 	Option* listArgs;
-	int maxArgs;
-	int currentArgs;
+	unsigned maxArgs;
+	unsigned currentArgs;
 public:
-	ArgsParser(const int nbArgs);
+	ArgsParser(const unsigned nbArgs);
 	void add(const char* shortArg, const char* longArg, const char* description, const int argCount, OptionArg* args, bool* present);
 	void add(Option option);
-	void execute(const int argc, char** argv);
-	int help(char** text);
+	void execute(const unsigned argc, char** argv);
+	unsigned help(char** text);
 	~ArgsParser();
 };
 

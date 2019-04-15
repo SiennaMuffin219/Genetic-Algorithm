@@ -67,9 +67,9 @@ void AG::evolve(const Digit* inputs, unsigned inputsSize)
 
 				Matrix results = population[i].getResults(inputs[j].getMatrixPixels());
 
-				unsigned result = 0;
+				int result = 0;
 				double max = results.get(0, 0);
-				for (unsigned i = 1; i < 10; i++)
+				for (int i = 1; i < 10; i++)
 				{
 					double cur = results.get(0, i);
 					if (cur > max)
